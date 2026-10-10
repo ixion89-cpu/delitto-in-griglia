@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<title>Delitto in Griglia</title>
+<meta name="description" content="Enigmi di deduzione in stile Murdoku: trova dove si trovava ognuno e scopri il colpevole.">
+<meta name="theme-color" content="#22362F">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Delitto">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+  <!-- SCHERMATA 1: scelta livello -->
+  <section id="home" class="screen active">
+    <header class="home-head">
+      <div class="kicker">ENIGMI DI DEDUZIONE</div>
+      <h1>Delitto<br>in Griglia</h1>
+      <p class="sub">Una persona per riga e per colonna. Tutti gli indizi sono veri. La vittima era sola con l'assassino.</p>
+    </header>
+    <div id="levels" class="levels"></div>
+    <div class="home-foot">
+      <button id="btnRules" class="ghost">Come si gioca</button>
+      <div id="totalSolved" class="muted"></div>
+    </div>
+  </section>
+
+  <!-- SCHERMATA 2: il caso -->
+  <section id="game" class="screen">
+    <header class="topbar">
+      <button id="btnBack" class="icon" aria-label="Indietro">←</button>
+      <div class="tb-center">
+        <div id="gKicker" class="kicker small"></div>
+        <div id="gTitle" class="tb-title"></div>
+      </div>
+      <div id="timer" class="timer">0:00</div>
+    </header>
+    <div class="scroll">
+      <details id="story" class="story" open>
+        <summary>La storia</summary>
+        <p id="gIntro"></p>
+      </details>
+      <div class="board-wrap"><div id="board" class="board"></div></div>
+      <div id="roomLegend" class="legend"></div>
+
+      <div class="tools">
+        <div id="palette" class="palette"></div>
+        <div class="modes">
+          <button class="mode active" data-mode="place" title="Posiziona la persona selezionata">👤 Posiziona</button>
+          <button class="mode" data-mode="note" title="Segna i candidati possibili">✏️ Appunti</button>
+          <button class="mode" data-mode="cross" title="Escludi una casella">✕ Escludi</button>
+          <button class="mode" data-mode="erase" title="Cancella una casella">🧽 Gomma</button>
+        </div>
+        <div class="actions">
+          <button id="btnUndo" class="small-btn" aria-label="Annulla">↶ Annulla</button>
+          <button id="btnRedo" class="small-btn" aria-label="Ripeti">↷ Ripeti</button>
+          <button id="btnReset" class="small-btn">⟲ Reset</button>
+          <button id="btnHint" class="small-btn">💡 Aiuto</button>
+        </div>
+        <div id="hintLine" class="muted tiny"></div>
+      </div>
+
+      <h3 class="sec">Gli indizi <span class="muted tiny">(tocca un indizio per segnarlo come usato)</span></h3>
+      <ul id="clues" class="clues"></ul>
+      <ul id="extra" class="clues extra"></ul>
+      <button id="btnCheck" class="primary big">Verifica e accusa</button>
+      <div class="pad"></div>
+    </div>
+  </section>
+</div>
+
+<!-- modali -->
+<div id="modal" class="modal hidden" role="dialog" aria-modal="true">
+  <div class="sheet">
+    <div id="modalBody"></div>
+  </div>
+</div>
+<div id="toast" class="toast"></div>
+
+<script src="puzzles.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
