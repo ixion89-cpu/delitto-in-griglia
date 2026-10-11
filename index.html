@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
 <title>Delitto in Griglia</title>
-<meta name="description" content="Enigmi di deduzione in stile Murdoku: trova dove si trovava ognuno e scopri il colpevole.">
+<meta name="description" content="Enigmi di deduzione: ricostruisci dove si trovava ognuno e risolvi il caso.">
 <meta name="theme-color" content="#22362F">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -71,6 +71,29 @@
       <ul id="extra" class="clues extra"></ul>
       <button id="btnCheck" class="primary big">Verifica e accusa</button>
       <div class="pad"></div>
+    </div>
+  </section>
+
+  <!-- interludio: prima e dopo l'episodio, senza video -->
+  <section id="scene" class="screen scene" role="dialog" aria-modal="true" aria-label="Interludio">
+    <div class="scene-bg" id="sceneBg"></div>
+    <div class="lamp" aria-hidden="true"></div>
+    <div class="scene-top">
+      <button id="scBack" class="scene-back" type="button" aria-label="Indietro">←</button>
+      <div id="scKicker" class="recon"></div>
+      <div class="scene-top-right">
+        <div id="scClock" class="clock"></div>
+        <button id="scSkip" class="skip" type="button">Salta</button>
+      </div>
+    </div>
+    <div class="cast">
+      <img id="scLeft" class="portrait left" alt="">
+      <img id="scRight" class="portrait right" alt="">
+    </div>
+    <div class="dlg" id="scDlg">
+      <div id="scName" class="nametag"></div>
+      <p id="scText" class="line"></p>
+      <button id="scNext" class="advance" type="button" aria-label="Battuta successiva">▶</button>
     </div>
   </section>
 </div>

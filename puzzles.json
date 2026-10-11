@@ -3400,5 +3400,423 @@
    "hypotheses": 1,
    "branch_nodes": 4
   }
+ },
+ {
+  "id": "n1",
+  "level": "nadir",
+  "mode": "ana",
+  "episode": 1,
+  "title": "Attracco al buio",
+  "setting": "Hangar di attracco",
+  "intro": "Blackout sulla Stazione Nadir. I sensori di presenza tengono una sola firma per riga e per colonna, e ogni frammento di log rimasto è vero: qui si cancella, non si falsifica. Ricostruisci dov'era l'equipaggio. Chi si trova sulla manovella ha aperto il portellone a mano.",
+  "size": 6,
+  "rooms": [
+   {
+    "id": "H",
+    "name": "Hangar",
+    "color": "#D5E3EE"
+   },
+   {
+    "id": "A",
+    "name": "Camera stagna",
+    "color": "#F6DCC8"
+   },
+   {
+    "id": "C",
+    "name": "Corridoio",
+    "color": "#E4DCEC"
+   },
+   {
+    "id": "K",
+    "name": "Plancia",
+    "color": "#D3E8DA"
+   },
+   {
+    "id": "G",
+    "name": "Stiva",
+    "color": "#EFE2C9"
+   }
+  ],
+  "grid": [
+   [
+    0,
+    0,
+    0,
+    1,
+    1,
+    1
+   ],
+   [
+    0,
+    0,
+    0,
+    1,
+    1,
+    1
+   ],
+   [
+    0,
+    0,
+    2,
+    2,
+    3,
+    3
+   ],
+   [
+    2,
+    2,
+    2,
+    2,
+    3,
+    3
+   ],
+   [
+    2,
+    2,
+    4,
+    4,
+    4,
+    4
+   ],
+   [
+    2,
+    2,
+    4,
+    4,
+    4,
+    4
+   ]
+  ],
+  "objects": [
+   {
+    "r": 0,
+    "c": 0,
+    "type": "generatore"
+   },
+   {
+    "r": 0,
+    "c": 5,
+    "type": "paratia"
+   },
+   {
+    "r": 1,
+    "c": 4,
+    "type": "manovella"
+   },
+   {
+    "r": 2,
+    "c": 5,
+    "type": "console"
+   },
+   {
+    "r": 3,
+    "c": 1,
+    "type": "estintore"
+   },
+   {
+    "r": 4,
+    "c": 0,
+    "type": "panca"
+   },
+   {
+    "r": 4,
+    "c": 3,
+    "type": "container"
+   },
+   {
+    "r": 5,
+    "c": 2,
+    "type": "rack"
+   }
+  ],
+  "objectTypes": {
+   "paratia": {
+    "name": "paratia",
+    "emoji": "🚪",
+    "blocking": true
+   },
+   "container": {
+    "name": "container",
+    "emoji": "📦",
+    "blocking": true
+   },
+   "generatore": {
+    "name": "generatore",
+    "emoji": "⚡",
+    "blocking": true
+   },
+   "console": {
+    "name": "console",
+    "emoji": "🖥️",
+    "blocking": true
+   },
+   "estintore": {
+    "name": "estintore",
+    "emoji": "🧯",
+    "blocking": true
+   },
+   "panca": {
+    "name": "panca",
+    "emoji": "🪑",
+    "blocking": false
+   },
+   "rack": {
+    "name": "rack",
+    "emoji": "🗄️",
+    "blocking": true
+   },
+   "manovella": {
+    "name": "manovella",
+    "emoji": "🔧",
+    "blocking": false
+   }
+  },
+  "people": [
+   {
+    "id": "V",
+    "name": "Teo",
+    "full": "Teo Vasquez",
+    "role": "ingegnere capo",
+    "gender": "m",
+    "color": "#C65A1E",
+    "victim": false,
+    "face": "assets/faces/vasquez.webp",
+    "clue": "Era nella riga subito sotto Okafor.",
+    "spec": {
+     "k": "rowsbelow",
+     "q": "O",
+     "d": 1
+    }
+   },
+   {
+    "id": "B",
+    "name": "Brenner",
+    "full": "Ilario Brenner",
+    "role": "comandante",
+    "gender": "m",
+    "color": "#2E4A5C",
+    "victim": false,
+    "face": "assets/faces/brenner.webp",
+    "clue": "Era accanto all'estintore.",
+    "spec": {
+     "k": "adj",
+     "t": "estintore"
+    }
+   },
+   {
+    "id": "O",
+    "name": "Okafor",
+    "full": "Yara Okafor",
+    "role": "medico di bordo",
+    "gender": "f",
+    "color": "#1F7A6B",
+    "victim": false,
+    "face": "assets/faces/okafor.webp",
+    "clue": "Era nella stessa colonna del container.",
+    "spec": {
+     "k": "colobj",
+     "t": "container"
+    }
+   },
+   {
+    "id": "N",
+    "name": "Nadia",
+    "full": "Nadia Ferrante",
+    "role": "comunicazioni",
+    "gender": "f",
+    "color": "#3E6E9A",
+    "victim": false,
+    "face": "assets/faces/nadia.webp",
+    "clue": "Era nel corridoio, nella stessa colonna del rack.",
+    "spec": {
+     "k": "and",
+     "parts": [
+      {
+       "k": "room",
+       "room": "C"
+      },
+      {
+       "k": "colobj",
+       "t": "rack"
+      }
+     ]
+    }
+   },
+   {
+    "id": "H",
+    "name": "Halvorsen",
+    "full": "Sven Halvorsen",
+    "role": "capo della sicurezza",
+    "gender": "m",
+    "color": "#6B5344",
+    "victim": false,
+    "face": "assets/faces/halvorsen.webp",
+    "clue": "Era nell'hangar, nella stessa colonna della panca.",
+    "spec": {
+     "k": "and",
+     "parts": [
+      {
+       "k": "room",
+       "room": "H"
+      },
+      {
+       "k": "colobj",
+       "t": "panca"
+      }
+     ]
+    }
+   },
+   {
+    "id": "M",
+    "name": "Mei",
+    "full": "Mei Takeda",
+    "role": "ricerca ambientale",
+    "gender": "f",
+    "color": "#2F6B4F",
+    "victim": false,
+    "face": "assets/faces/mei.webp",
+    "clue": "Era in stiva, nella stessa colonna della paratia.",
+    "spec": {
+     "k": "and",
+     "parts": [
+      {
+       "k": "room",
+       "room": "G"
+      },
+      {
+       "k": "colobj",
+       "t": "paratia"
+      }
+     ]
+    }
+   }
+  ],
+  "extraClues": [],
+  "extraSpecs": [],
+  "solution": {
+   "V": [
+    1,
+    4
+   ],
+   "B": [
+    4,
+    1
+   ],
+   "O": [
+    0,
+    3
+   ],
+   "N": [
+    3,
+    2
+   ],
+   "H": [
+    2,
+    0
+   ],
+   "M": [
+    5,
+    5
+   ]
+  },
+  "answerCell": [
+   1,
+   4
+  ],
+  "answerObject": "manovella",
+  "culprit": "V",
+  "question": {
+   "title": "Chi ha aperto il portellone?",
+   "prompt": "La mappa è corretta. Chi era sulla manovella?",
+   "wrong": "Non era sulla manovella."
+  },
+  "explanation": [
+   "Okafor → D1: nessun altro poteva occupare la riga 1.",
+   "Mei → F6: nessun altro poteva occupare la riga 6.",
+   "Teo → E2: è l'unica casella coerente con l'indizio che lo lega a Okafor.",
+   "Halvorsen → A3: è l'unica casella compatibile con il suo indizio, escluse righe e colonne già occupate.",
+   "Nadia → C4: è l'unica casella compatibile con il suo indizio, escluse righe e colonne già occupate.",
+   "Brenner → B5: è l'unica casella compatibile con il suo indizio, escluse righe e colonne già occupate.",
+   "Sulla manovella (E2) c'era Teo Vasquez: ha aperto il portellone a mano."
+  ],
+  "stats": {
+   "hidden": 3,
+   "binary": 3,
+   "victim": 0,
+   "noempty": 0,
+   "hypotheses": 0,
+   "branch_nodes": 1
+  },
+  "scenes": {
+   "intro": {
+    "kicker": "RECON // LOG 01",
+    "clock": "NADIR · T+06:12:40",
+    "bg": "assets/bg/hangar.webp",
+    "lines": [
+     {
+      "who": "vasquez",
+      "expr": "worried",
+      "text": "Benvenuta sulla Nadir, ispettrice. Scusi il buio: il generatore principale è giù da sei ore."
+     },
+     {
+      "who": "livia",
+      "expr": "neutral",
+      "text": "Sei ore. E il portellone dell'hangar risulta aperto. Non è così che si attracca, ingegnere."
+     },
+     {
+      "who": "vasquez",
+      "expr": "worried",
+      "text": "Il comando automatico è morto col generatore. Qualcuno ha girato la manovella a mano, pochi minuti prima che la sua navetta entrasse nel raggio."
+     },
+     {
+      "who": "livia",
+      "expr": "neutral",
+      "text": "Pochi minuti prima. Allora non l'hanno aperto per me. Chi c'era di turno?"
+     },
+     {
+      "who": "vasquez",
+      "expr": "worried",
+      "text": "L'equipaggio non lo ricorda. I log rimasti sono veri: qui si cancella, non si falsifica. Ma mancano interi minuti."
+     },
+     {
+      "who": "livia",
+      "expr": "neutral",
+      "text": "Allora li ricostruisco. I sensori tengono una firma per binario: una persona per riga e per colonna. Se la griglia chiude, sappiamo chi era sulla manovella."
+     }
+    ]
+   },
+   "outro": {
+    "kicker": "RECON // LOG 01 · ESITO",
+    "clock": "NADIR · T+07:02:18",
+    "bg": "assets/bg/hangar.webp",
+    "lines": [
+     {
+      "who": "livia",
+      "expr": "neutral",
+      "text": "La ricostruzione è unica. Sulla manovella c'era Lei, Vasquez. Il portellone l'ha aperto a mano, prima ancora che la mia navetta fosse nel raggio."
+     },
+     {
+      "who": "vasquez",
+      "expr": "surprised",
+      "text": "Con il generatore a terra il portellone non obbedisce. O lo giravo io, o Lei restava fuori dalla stazione."
+     },
+     {
+      "who": "livia",
+      "expr": "neutral",
+      "text": "L'orario non coincide con un benvenuto. Il log è incompleto, non falso: Lei l'ha aperto senza autorizzazione."
+     },
+     {
+      "who": "vasquez",
+      "expr": "worried",
+      "text": "Non sono stato l'unico a muovermi al buio. Nel laboratorio ambientale il sensore dell'ossigeno ha lo stesso buco, negli stessi minuti."
+     },
+     {
+      "who": "livia",
+      "expr": "worried",
+      "text": "Ivo Rendina era di turno ai sensori. Non risponde. La prossima ricostruzione inizia da lì."
+     }
+    ]
+   }
+  }
  }
 ]
