@@ -138,12 +138,13 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
 .expl{padding-left:20px;margin:6px 0} .expl li{margin:4px 0;font-size:14px}
 .mini{display:flex;justify-content:center;margin:10px 0;--cs:64px}
 .toast{position:fixed;left:50%;bottom:calc(24px + var(--safe-bot));transform:translateX(-50%) translateY(120px);background:var(--ink);color:var(--bg);
-  padding:12px 18px;border-radius:999px;font-size:14px;font-weight:600;transition:transform .25s;z-index:60;max-width:90%;text-align:center}
+  padding:12px 18px;border-radius:999px;font-size:14px;font-weight:600;transition:transform .25s;z-index:60;max-width:90%;text-align:center;pointer-events:none}
+.toast.show{pointer-events:auto}
 .toast.show{transform:translateX(-50%) translateY(0)}
 @media (max-width:360px){.home-head h1{font-size:38px}.mode{font-size:12px}}
 
 /* interludio, a tutto schermo anche su desktop */
-#scene.screen.active{position:fixed;inset:0;z-index:40;display:flex;flex-direction:column;max-width:none;width:auto;
+#scene.screen.active{position:fixed;inset:0;z-index:70;display:flex;flex-direction:column;max-width:none;width:auto;
   background:#070B10;color:#E8EEF2;overflow:hidden;cursor:pointer;
   font-family:Inter,"Noto Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
 .scene-bg{position:absolute;inset:0;background-position:center 18%;background-size:cover;background-repeat:no-repeat}
@@ -165,7 +166,7 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
   min-height:36px;background:rgba(8,14,18,.45)}
 .cast{position:relative;z-index:3;flex:1;min-height:160px}
 .portrait{position:absolute;bottom:0;height:min(92%,820px);width:auto;max-width:min(50vw,520px);object-fit:contain;
-  object-position:bottom center;filter:brightness(.4) saturate(.72);pointer-events:none;user-select:none;-webkit-user-drag:none}
+  object-position:bottom center;filter:brightness(.62) saturate(.85);pointer-events:none;user-select:none;-webkit-user-drag:none}
 .portrait.left{left:1vw}.portrait.right{right:1vw}
 .portrait.speak{filter:none;z-index:2;animation:bob 2.6s ease-in-out infinite}
 @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
