@@ -1,4 +1,4 @@
-const CACHE = 'delitto-v3';
+const CACHE = 'delitto-v4';
 const ASSETS = ['./', './index.html', './style.css', './app.js', './puzzles.js', './puzzles.json', './manifest.json',
   './icons/icon-192.png', './icons/icon-512.png', './icons/apple-touch-icon.png',
   './assets/bg/hangar.webp',
