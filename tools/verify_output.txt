@@ -1,4 +1,4 @@
-Verifica unicità dei casi Murdoku
+Verifica unicità dei casi
 ============================================================
 f1 Veleno in pasticceria          facile    5x5  soluzioni=1  coincide=sì  colpevole=D  nodi_ricerca=9  ipotesi_umane=0  nodi_ipotesi=1  passi_righe/colonne=2  passi_relativi=0  t=0.0s  OK
 f2 Il caso della libreria         facile    5x5  soluzioni=1  coincide=sì  colpevole=R  nodi_ricerca=15  ipotesi_umane=0  nodi_ipotesi=1  passi_righe/colonne=2  passi_relativi=0  t=0.0s  OK
@@ -8,7 +8,8 @@ m1 Il treno della notte           medio     6x6  soluzioni=1  coincide=sì  colp
 m2 Mistero al museo               medio     7x7  soluzioni=1  coincide=sì  colpevole=F  nodi_ricerca=928  ipotesi_umane=0  nodi_ipotesi=1  passi_righe/colonne=3  passi_relativi=1  t=0.0s  OK
 m3 Check-out fatale               medio     7x7  soluzioni=1  coincide=sì  colpevole=G  nodi_ricerca=395  ipotesi_umane=0  nodi_ipotesi=1  passi_righe/colonne=2  passi_relativi=0  t=0.0s  OK
 d1 Evasione impossibile           difficile 8x8  soluzioni=1  coincide=sì  colpevole=C  nodi_ricerca=428  ipotesi_umane=1  nodi_ipotesi=4  passi_righe/colonne=0  passi_relativi=7  t=0.0s  OK
-d2 Crociera fatale                difficile 8x8  soluzioni=1  coincide=sì  colpevole=C  nodi_ricerca=4702  ipotesi_umane=3  nodi_ipotesi=29  passi_righe/colonne=0  passi_relativi=1  t=0.2s  OK
-d3 Il castello di Montebruno      difficile 9x9  soluzioni=1  coincide=sì  colpevole=B  nodi_ricerca=23802  ipotesi_umane=1  nodi_ipotesi=4  passi_righe/colonne=5  passi_relativi=10  t=1.4s  OK
+d2 Crociera fatale                difficile 8x8  soluzioni=1  coincide=sì  colpevole=C  nodi_ricerca=4702  ipotesi_umane=3  nodi_ipotesi=29  passi_righe/colonne=0  passi_relativi=1  t=0.3s  OK
+d3 Il castello di Montebruno      difficile 9x9  soluzioni=1  coincide=sì  colpevole=B  nodi_ricerca=23802  ipotesi_umane=1  nodi_ipotesi=4  passi_righe/colonne=5  passi_relativi=10  t=2.4s  OK
+n1 Attracco al buio               nadir     6x6  soluzioni=1  coincide=sì  colpevole=V  nodi_ricerca=65  ipotesi_umane=0  nodi_ipotesi=1  passi_righe/colonne=3  passi_relativi=3  t=0.0s  OK
 ============================================================
 TUTTI I CASI HANNO SOLUZIONE UNICA

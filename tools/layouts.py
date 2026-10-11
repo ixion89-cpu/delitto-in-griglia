@@ -44,6 +44,15 @@ OBJ = {
  'pentolone':  ('pentolone', 'm', '🍲', True),
  'candelabro': ('candelabro', 'm', '🕯️', True),
  'albero':     ('albero', 'ma', '🌳', True),
+ # stazione (episodio Nadir): occupabile = ci si può stare sopra
+ 'generatore': ('generatore', 'm', '⚡', True),
+ 'manovella':  ('manovella', 'f', '🔧', False),
+ 'console':    ('console', 'f', '🖥️', True),
+ 'estintore':  ('estintore', 'ma', '🧯', True),
+ 'container':  ('container', 'm', '📦', True),
+ 'rack':       ('rack', 'm', '🗄️', True),
+ 'panca':      ('panca', 'f', '🪑', False),
+ 'paratia':    ('paratia', 'f', '🚪', True),
 }
 
 PALETTE = ['#F3DDB3', '#D7E3EA', '#DBE7D2', '#EDD5CF', '#E4DAEE', '#F1E7C4', '#CFE5E0', '#EFD3B8', '#E2E1CF']

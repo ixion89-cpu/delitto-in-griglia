@@ -1,7 +1,7 @@
 {
   "name": "Delitto in Griglia",
   "short_name": "Delitto",
-  "description": "Enigmi di deduzione in stile Murdoku",
+  "description": "Enigmi di deduzione: una persona per riga e per colonna",
   "lang": "it",
   "start_url": "./index.html",
   "scope": "./",

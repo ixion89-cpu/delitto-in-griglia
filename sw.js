@@ -1,6 +1,13 @@
-const CACHE = 'delitto-v2';
+const CACHE = 'delitto-v3';
 const ASSETS = ['./', './index.html', './style.css', './app.js', './puzzles.js', './puzzles.json', './manifest.json',
-  './icons/icon-192.png', './icons/icon-512.png', './icons/apple-touch-icon.png'];
+  './icons/icon-192.png', './icons/icon-512.png', './icons/apple-touch-icon.png',
+  './assets/bg/hangar.webp',
+  './assets/cast/livia.webp', './assets/cast/vasquez.webp', './assets/cast/brenner.webp', './assets/cast/okafor.webp',
+  './assets/cast/nadia.webp', './assets/cast/halvorsen.webp', './assets/cast/mei.webp',
+  './assets/faces/vasquez.webp', './assets/faces/brenner.webp', './assets/faces/okafor.webp',
+  './assets/faces/nadia.webp', './assets/faces/halvorsen.webp', './assets/faces/mei.webp',
+  './assets/expr/livia-neutral.webp', './assets/expr/livia-surprised.webp', './assets/expr/livia-angry.webp', './assets/expr/livia-worried.webp',
+  './assets/expr/vasquez-neutral.webp', './assets/expr/vasquez-surprised.webp', './assets/expr/vasquez-angry.webp', './assets/expr/vasquez-worried.webp'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting()));
 });

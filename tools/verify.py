@@ -54,7 +54,8 @@ def build(pz):
 def solve_all(pz):
     n, room, blocking, U, G = build(pz)
     ppl = [p['id'] for p in pz['people']]; spec = {p['id']: p['spec'] for p in pz['people']}
-    V = [p['id'] for p in pz['people'] if p['victim']][0]
+    victims = [p['id'] for p in pz['people'] if p.get('victim')]
+    V = victims[0] if victims else None
     sols = []; nodes = [0]; pos = {}
     def ok(full):
         for p in pos:
@@ -63,7 +64,7 @@ def solve_all(pz):
         for p in ppl:
             if p not in pos and spec[p]['k'] in ('sameroom','diffroom','rowsbelow','below','above','leftof','rightof','diag'): pass
         if not all(G(s, pos, full) for s in pz['extraSpecs']): return False
-        if V in pos:
+        if V and V in pos:
             cnt = sum(1 for x in pos.values() if room(*x) == room(*pos[V]))
             if cnt > 2 or (full and cnt != 2): return False
         return True
@@ -83,7 +84,7 @@ def solve_all(pz):
     rec(0, frozenset())
     return sols, nodes[0], V, room
 
-print("Verifica unicità dei casi Murdoku\n" + "=" * 60)
+print("Verifica unicità dei casi\n" + "=" * 60)
 allok = True
 for pz in P:
     t0 = time.time()
@@ -93,7 +94,11 @@ for pz in P:
     same = uniq and sols[0] == saved
     culprit = None
     if uniq:
-        vr = room(*sols[0][V]); culprit = [p for p, x in sols[0].items() if p != V and room(*x) == vr]
+        if pz.get('mode') == 'ana':
+            ac = tuple(pz['answerCell'])
+            culprit = [p for p, x in sols[0].items() if x == ac]
+        else:
+            vr = room(*sols[0][V]); culprit = [p for p, x in sols[0].items() if p != V and room(*x) == vr]
     good = uniq and same and culprit == [pz['culprit']]
     allok &= good
     st = pz['stats']

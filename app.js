@@ -6,7 +6,11 @@ const LEVELS = [
   {id: 'facile', name: 'Facile', icon: '🔍', meta: 'Griglie 5×5 e 6×6, indizi diretti'},
   {id: 'medio', name: 'Medio', icon: '🕵️', meta: 'Griglie 6×6 e 7×7, indizi incrociati'},
   {id: 'difficile', name: 'Difficile', icon: '🗝️', meta: 'Griglie 8×8 e 9×9, indizi negativi e relativi'},
+  {id: 'nadir', name: 'Stazione Nadir', icon: '🛰️', meta: 'Attracco al buio · tra Facile e Medio'},
 ];
+// Porta leggera: confronto SHA-256, la parola non sta in chiaro.
+const NADIR_HASH = '4682587e1e591daf02f16e89eaf7394eeb8e9c96b48c21fa5e2384c4f9774f13';
+function nadirOpen() { return LS.get('nadir', false) === true; }
 const COLS = 'ABCDEFGHI';
 const LS = {
   get(k, d) { try { const v = localStorage.getItem('dig.' + k); return v ? JSON.parse(v) : d; } catch (e) { return d; } },
@@ -18,7 +22,10 @@ const el = (tag, cls, html) => { const e = document.createElement(tag); if (cls)
 const fmt = s => { s = Math.floor(s); const h = Math.floor(s / 3600), m = Math.floor(s / 60) % 60, x = s % 60; return (h ? h + ':' + String(m).padStart(2, '0') : m) + ':' + String(x).padStart(2, '0'); };
 const esc = s => String(s).replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]));
 function toast(msg, ms = 2200) { const t = $('#toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove('show'), ms); }
-function avatar(p, extra = '') { return `<div class="person ${p.victim ? 'victim' : ''} ${extra}" style="background:${p.color}">${esc(p.id)}</div>`; }
+function avatar(p, extra = '') {
+  const face = p.face ? `<img src="${esc(p.face)}" alt="">` : esc(p.id);
+  return `<div class="person${p.face ? ' has-face' : ''}${p.victim ? ' victim' : ''}${extra ? ' ' + extra : ''}" style="--pc:${p.color};background:${p.color}">${face}</div>`;
+}
 
 /* ---------- HOME ---------- */
 function progress() { return LS.get('progress', {}); }
@@ -29,24 +36,45 @@ function renderHome() {
     const list = PUZ.filter(p => p.level === L.id);
     const solved = list.filter(p => prog[p.id] && prog[p.id].solved).length; tot += solved;
     const bests = list.map(p => prog[p.id] && prog[p.id].best).filter(Boolean);
-    const b = el('button', 'level l-' + L.id);
-    b.innerHTML = `<div class="badge">${L.icon}</div>
-      <div><div class="lv-name">${L.name}</div><div class="lv-meta">${L.meta}</div>
-      ${bests.length ? `<div class="lv-meta">Miglior tempo: ${fmt(Math.min(...bests))}</div>` : ''}</div>
-      <div class="lv-prog"><b>${solved}/${list.length}</b>risolti<div class="dots">${list.map(p => `<i class="${prog[p.id] && prog[p.id].solved ? 'on' : ''}"></i>`).join('')}</div></div>`;
-    b.onclick = () => openRandom(L.id);
+    const locked = L.id === 'nadir' && !nadirOpen();
+    const b = el('button', 'level l-' + L.id + (locked ? ' locked' : ''));
+    const meta = locked ? 'Episodio 1 · serve una parola d\'ordine' : L.meta;
+    const icon = locked ? '🔒' : L.icon;
+    const progHtml = locked
+      ? '<div class="lv-prog"><b>Bloccato</b>campagna</div>'
+      : `<div class="lv-prog"><b>${solved}/${list.length}</b>risolti<div class="dots">${list.map(p => `<i class="${prog[p.id] && prog[p.id].solved ? 'on' : ''}"></i>`).join('')}</div></div>`;
+    b.innerHTML = `<div class="badge">${icon}</div>
+      <div><div class="lv-name">${L.name}</div><div class="lv-meta">${meta}</div>
+      ${!locked && bests.length ? `<div class="lv-meta">Miglior tempo: ${fmt(Math.min(...bests))}</div>` : ''}</div>
+      ${progHtml}`;
+    if (locked) b.setAttribute('aria-label', 'Stazione Nadir, bloccato. Inserisci la parola d\'ordine.');
+    b.onclick = () => locked ? askKeyword() : openRandom(L.id);
     box.appendChild(b);
   }
   $('#totalSolved').textContent = `${tot}/${PUZ.length} casi risolti`;
 }
 function openRandom(level) {
+  if (level === 'nadir' && !nadirOpen()) { askKeyword(); return; }
   const list = PUZ.filter(p => p.level === level);
   const last = LS.get('last.' + level, null);
   let pool = list.filter(p => p.id !== last);
   if (!pool.length) pool = list;
   const pz = pool[Math.floor(Math.random() * pool.length)];
   LS.set('last.' + level, pz.id);
-  openPuzzle(pz.id);
+  if (level === 'nadir') beginEpisode(pz.id);
+  else openPuzzle(pz.id);
+}
+function beginEpisode(id) {
+  const pz = PUZ.find(p => p.id === id); if (!pz) return;
+  if (pz.level === 'nadir' && !nadirOpen()) { askKeyword(); return; }
+  const saved = LS.get('state.' + id, null);
+  const seen = LS.get('intro.' + id, false);
+  const solved = progress()[id] && progress()[id].solved;
+  if (!seen && !saved && !solved && pz.scenes && pz.scenes.intro) {
+    playScene(pz, 'intro', () => { LS.set('intro.' + id, true); openPuzzle(id); }, () => goHome());
+    return;
+  }
+  openPuzzle(id);
 }
 function show(id) { document.querySelectorAll('.screen').forEach(s => s.classList.toggle('active', s.id === id)); }
 
@@ -62,6 +90,7 @@ function openPuzzle(id) {
   $('#gKicker').textContent = `${lv.name.toUpperCase()} · ${pz.setting.toUpperCase()} · ${pz.size}×${pz.size}`;
   $('#gTitle').textContent = pz.title;
   $('#gIntro').textContent = pz.intro;
+  $('#btnCheck').textContent = pz.mode === 'ana' ? 'Verifica la ricostruzione' : 'Verifica e accusa';
   $('#story').open = !saved;
   setMode('place');
   buildBoard(); renderAll(); show('game');
@@ -197,7 +226,8 @@ function renderClues() {
   const ul = $('#clues'); ul.innerHTML = '';
   G.pz.people.forEach(p => {
     const li = el('li', 'clue' + (p.victim ? ' victim' : '') + (G.used[p.id] ? ' used' : ''));
-    li.innerHTML = avatar(p) + `<div class="ct"><b>${esc(p.name)}${p.victim ? ' · vittima' : ''}</b><span>${esc(p.clue)}</span></div>`;
+    const who = p.full || p.name;
+    li.innerHTML = avatar(p) + `<div class="ct"><b>${esc(who)}${p.role ? ' · ' + esc(p.role) : ''}${p.victim ? ' · vittima' : ''}</b><span>${esc(p.clue)}</span></div>`;
     li.onclick = () => { G.used[p.id] = !G.used[p.id]; renderClues(); save(); };
     ul.appendChild(li);
   });
@@ -246,6 +276,13 @@ $('#btnCheck').onclick = () => {
     modal(`<h2>Qualcosa non torna</h2><p>${wrong.length === 1 ? 'Una persona non è' : wrong.length + ' persone non sono'} nel posto giusto. Rileggi gli indizi: sono tutti veri.</p>
       <div class="row"><button class="primary" data-act="close">Torna al caso</button></div>`); return;
   }
+  if (pz.mode === 'ana') {
+    const q = pz.question;
+    modal(`<h2>${esc(q.title)}</h2><p>${esc(q.prompt)}</p>
+      <div class="accuse">${pz.people.map(p => `<button data-act="acc" data-id="${p.id}">${avatar(p)}${esc(p.name)}</button>`).join('')}</div>`, {
+      acc: (b) => { if (b.dataset.id === pz.culprit) win(); else toast(q.wrong); } });
+    return;
+  }
   const sus = pz.people.filter(p => !p.victim);
   modal(`<h2>Il colpevole è…</h2><p>La mappa è corretta. Chi era solo con ${esc(pz.people.find(p => p.victim).name)}?</p>
     <div class="accuse">${sus.map(p => `<button data-act="acc" data-id="${p.id}">${avatar(p)}${esc(p.name)}</button>`).join('')}</div>`, {
@@ -257,16 +294,33 @@ function win() {
   const best = prev.best ? Math.min(prev.best, t) : t; const record = !prev.best || t < prev.best;
   prog[pz.id] = {solved: true, best, hints: Math.min(prev.hints == null ? 99 : prev.hints, G.hints.length), last: Date.now()};
   LS.set('progress', prog); LS.del('state.' + pz.id);
-  const c = person(pz.culprit), v = pz.people.find(p => p.victim);
-  modal(`<div class="win-head"><div class="stamp">CASO CHIUSO</div>
-    <h2>${esc(c.name)} è ${c.gender === 'f' ? 'la colpevole' : 'il colpevole'}!</h2>
+  G.result = {t, best, record};
+  if (location.hash) history.replaceState({g: pz.id}, '', location.pathname + location.search);
+  if (pz.mode === 'ana' && pz.scenes && pz.scenes.outro) { closeModal(); playScene(pz, 'outro', showDebrief, showDebrief); return; }
+  showDebrief();
+}
+function showDebrief() {
+  if ($('#scene').classList.contains('active')) show('game');
+  const pz = G.pz, c = person(pz.culprit);
+  const {t, best, record} = G.result;
+  const againLabel = pz.mode === 'ana'
+    ? 'Rigioca l\'episodio'
+    : `Nuovo caso ${esc(LEVELS.find(l => l.id === pz.level).name.toLowerCase())}`;
+  const head = pz.mode === 'ana'
+    ? `<div class="stamp">LOG CHIUSO</div><h2>${esc(c.full || c.name)} ha aperto il portellone</h2>`
+    : `<div class="stamp">CASO CHIUSO</div><h2>${esc(c.name)} è ${c.gender === 'f' ? 'la colpevole' : 'il colpevole'}!</h2>`;
+  const hook = pz.mode === 'ana'
+    ? `<p class="hook">Prossima traccia: nel laboratorio ambientale il sensore dell'ossigeno ha lo stesso buco. Ivo Rendina, tecnico dei sensori, non risponde.</p>`
+    : '';
+  modal(`<div class="win-head">${head}
     <div class="mini">${avatar(c)}</div>
     <div class="stats"><div><b>${fmt(t)}</b>tempo</div><div><b>${fmt(best)}</b>${record ? 'nuovo record' : 'record'}</div><div><b>${G.hints.length}</b>aiuti</div></div></div>
     <h3 class="sec">La soluzione</h3>
     <ol class="expl">${pz.explanation.map(s => `<li>${esc(s)}</li>`).join('')}</ol>
-    <div class="row"><button class="sec-btn" data-act="home">Livelli</button><button class="primary" data-act="again">Nuovo caso ${esc(LEVELS.find(l => l.id === pz.level).name.toLowerCase())}</button></div>`, {
+    ${hook}
+    <div class="row"><button class="sec-btn" data-act="home">Livelli</button><button class="primary" data-act="again">${againLabel}</button></div>`, {
       home: () => { closeModal(); goHome(); },
-      again: () => { closeModal(); openRandom(pz.level); } });
+      again: () => { closeModal(); if (pz.mode === 'ana') openPuzzle(pz.id); else openRandom(pz.level); } });
 }
 
 /* ---------- modale ---------- */
@@ -283,9 +337,10 @@ window.addEventListener('popstate', () => { if ($('#game').classList.contains('a
 $('#btnRules').onclick = () => modal(`<h2>Come si gioca</h2><ul>
   <li>Sulla mappa ci sono le stanze (bordi spessi) e alcuni oggetti.</li>
   <li>Ogni riga e ogni colonna contiene <b>esattamente una persona</b>, vittima compresa.</li>
-  <li>Sulle caselle con oggetti come tavoli, piante o TV non può stare nessuno. Su letti, sedie, poltrone, divani e tappeti invece sì.</li>
+  <li>Sulle caselle con oggetti come tavoli, piante o TV non può stare nessuno. Su letti, sedie, poltrone, divani, tappeti, panche e manovelle sì: nella legenda sono segnati come occupabili.</li>
   <li>"Accanto" significa che le caselle condividono un lato. Righe numerate dall'alto (1, 2, 3…), colonne con lettere da sinistra (A, B, C…).</li>
   <li>Tutti gli indizi sono veri. La vittima era sola con l'assassino: il colpevole è l'unica altra persona nella stanza della vittima.</li>
+  <li>Nella campagna <b>Stazione Nadir</b> non c'è sempre un omicidio: la domanda finale dice chi ha compiuto l'azione, per esempio chi si trova sulla manovella.</li>
   <li>Ogni caso ha una sola soluzione, verificata.</li></ul>
   <h3 class="sec">Prendere appunti</h3><ul>
   <li><b>👤 Posiziona</b>: scegli una persona in basso e tocca la casella.</li>
@@ -296,11 +351,139 @@ $('#btnRules').onclick = () => modal(`<h2>Come si gioca</h2><ul>
 
 window.addEventListener('resize', () => { if (G) { buildBoard(); renderAll(); } });
 
+/* ---------- parola d'ordine ---------- */
+let kwBusy = false;
+function askKeyword() {
+  modal(`<h2>Accesso riservato</h2>
+    <p>La campagna della Stazione Nadir è chiusa. Inserisci la parola d'ordine per sbloccare l'episodio.</p>
+    <input id="kw" class="kw" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" aria-label="Parola d'ordine" enterkeyhint="go">
+    <div id="kwErr" class="kw-err"></div>
+    <div class="row"><button class="sec-btn" data-act="close">Annulla</button><button class="primary" data-act="go">Entra</button></div>`,
+    {go: () => submitKw()});
+  const inp = $('#kw');
+  if (!inp) return;
+  setTimeout(() => inp.focus(), 40);
+  inp.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); submitKw(); } });
+}
+async function sha256hex(text) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+  return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, '0')).join('');
+}
+async function submitKw() {
+  if (kwBusy) return;
+  const inp = $('#kw'); if (!inp) return;
+  const raw = inp.value.trim();
+  const err = $('#kwErr');
+  if (!raw) { err.textContent = 'Inserisci la parola d\'ordine.'; return; }
+  if (!window.crypto || !crypto.subtle) { err.textContent = 'Per verificare la parola apri il gioco da un indirizzo https.'; return; }
+  kwBusy = true;
+  try {
+    const h = await sha256hex(raw);
+    if (h === NADIR_HASH) {
+      LS.set('nadir', true);
+      inp.value = '';
+      closeModal();
+      toast('Campagna sbloccata');
+      renderHome();
+      beginEpisode('n1');
+    } else {
+      err.textContent = 'Non corrisponde. Controlla le maiuscole e riprova.';
+      inp.classList.remove('shake'); void inp.offsetWidth; inp.classList.add('shake');
+    }
+  } finally { kwBusy = false; }
+}
+
+/* ---------- interludio ---------- */
+const CAST = {
+  livia: {name: 'LIVIA SARNO', color: '#C6D98A', side: 'left'},
+  vasquez: {name: 'TEO VASQUEZ', color: '#E8833A', side: 'right'},
+};
+let SC = null;
+function playScene(pz, which, onDone, onAbort) {
+  const sc = pz.scenes[which];
+  clearInterval(SC && SC.timer);
+  SC = {lines: sc.lines, i: 0, onDone, onAbort, typing: false, full: '', expr: {livia: 'neutral', vasquez: 'neutral'}};
+  $('#scKicker').textContent = sc.kicker;
+  $('#scClock').textContent = sc.clock;
+  $('#sceneBg').style.backgroundImage = `url("${sc.bg}")`;
+  show('scene');
+  renderSceneLine();
+}
+function renderSceneLine() {
+  const line = SC.lines[SC.i];
+  SC.expr[line.who] = line.expr || 'neutral';
+  ['livia', 'vasquez'].forEach(who => {
+    const meta = CAST[who];
+    const img = $(meta.side === 'left' ? '#scLeft' : '#scRight');
+    img.src = `assets/expr/${who}-${SC.expr[who]}.webp`;
+    img.alt = meta.name;
+    img.classList.toggle('speak', who === line.who);
+  });
+  const meta = CAST[line.who];
+  const tag = $('#scName');
+  tag.textContent = meta.name;
+  tag.style.background = meta.color;
+  tag.style.color = '#1A140E';
+  tag.classList.toggle('left', meta.side === 'left');
+  tag.classList.toggle('right', meta.side === 'right');
+  typeText(line.text);
+}
+function typeText(text) {
+  const el = $('#scText');
+  SC.full = text; SC.typing = true;
+  el.textContent = '';
+  el.classList.add('typing');
+  clearInterval(SC.timer);
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    el.textContent = text; SC.typing = false; el.classList.remove('typing'); return;
+  }
+  let n = 0;
+  SC.timer = setInterval(() => {
+    n++;
+    el.textContent = text.slice(0, n);
+    if (n >= text.length) { clearInterval(SC.timer); SC.typing = false; el.classList.remove('typing'); }
+  }, 18);
+}
+function advanceScene() {
+  if (!SC) return;
+  if (SC.typing) {
+    clearInterval(SC.timer); SC.typing = false;
+    const el = $('#scText'); el.textContent = SC.full; el.classList.remove('typing');
+    return;
+  }
+  if (SC.i + 1 >= SC.lines.length) { finishScene(true); return; }
+  SC.i++; renderSceneLine();
+}
+function finishScene(done) {
+  if (!SC) return;
+  clearInterval(SC.timer);
+  const cb = done ? SC.onDone : SC.onAbort;
+  SC = null;
+  if (cb) cb();
+}
+$('#scene').addEventListener('click', e => {
+  if (e.target.closest('#scSkip') || e.target.closest('#scBack')) return;
+  advanceScene();
+});
+$('#scSkip').onclick = e => { e.stopPropagation(); finishScene(true); };
+$('#scBack').onclick = e => { e.stopPropagation(); finishScene(false); };
+$('#scNext').onclick = e => { e.stopPropagation(); advanceScene(); };
+document.addEventListener('keydown', e => {
+  if (!$('#scene').classList.contains('active') || !SC) return;
+  if (e.key === 'Escape') { e.preventDefault(); finishScene(false); }
+  else if (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowRight') { e.preventDefault(); advanceScene(); }
+});
+
 /* ---------- avvio ---------- */
 renderHome();
 const qs = new URLSearchParams(location.search);
 const startId = qs.get('caso') || (location.hash ? location.hash.slice(1) : null);
-if (startId && PUZ.find(p => p.id === startId)) openPuzzle(startId);
+if (startId && PUZ.find(p => p.id === startId)) {
+  const pz = PUZ.find(p => p.id === startId);
+  if (pz.level === 'nadir' && !nadirOpen()) askKeyword();
+  else if (pz.level === 'nadir') beginEpisode(pz.id);
+  else openPuzzle(startId);
+}
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(() => {});
 window.__dig = {openPuzzle, tapCell, setMode: m => setMode(m), select: id => { G.sel = id; renderPalette(); }, state: () => G};
 })();

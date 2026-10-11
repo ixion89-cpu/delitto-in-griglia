@@ -25,6 +25,9 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
 .level:active{transform:scale(.98)}
 .level .badge{width:56px;height:56px;border-radius:14px;display:grid;place-items:center;font-size:24px;flex:none;border:2px solid var(--ink)}
 .level.l-facile .badge{background:#DBE7D2} .level.l-medio .badge{background:#F3DDB3} .level.l-difficile .badge{background:#EDD5CF}
+.level.l-nadir .badge{background:#D5E3EE}
+.level.locked{opacity:.82}
+.level.locked .badge{background:#1E2A33;color:#F6DCC8;border-color:#1E2A33}
 .level .lv-name{font-size:21px;font-weight:800}
 .level .lv-meta{font-size:13px;color:var(--ink2);margin-top:3px}
 .level .lv-prog{margin-left:auto;text-align:right;font-size:13px;color:var(--ink2);flex:none}
@@ -63,6 +66,8 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
 .cell.rowcol{box-shadow:inset 0 0 0 999px rgba(34,54,47,.06)}
 .person{width:calc(var(--cs) * .74);height:calc(var(--cs) * .74);border-radius:50%;display:grid;place-items:center;color:#fff;
   font-weight:800;font-size:calc(var(--cs) * .38);box-shadow:0 1px 2px rgba(0,0,0,.25);position:relative;z-index:1}
+.person.has-face{padding:2px;overflow:hidden;background:var(--pc)}
+.person.has-face img{width:100%;height:100%;object-fit:cover;object-position:center 12%;border-radius:50%;display:block}
 .person.victim{outline:2px solid #fff;outline-offset:-4px}
 .person.hinted::after{content:'';position:absolute;inset:-3px;border-radius:50%;border:2px dashed var(--gold)}
 .person.wrong{animation:shake .4s}
@@ -114,6 +119,11 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
 @keyframes up{from{transform:translateY(30px);opacity:.4}to{transform:none;opacity:1}}
 .sheet h2{margin:4px 0 8px;font-size:24px}
 .sheet p,.sheet li{font-size:15px;line-height:1.45;color:var(--ink2)}
+.sheet input.kw{width:100%;margin-top:10px;min-height:48px;border-radius:12px;border:1.5px solid var(--ink);
+  padding:0 14px;font-size:16px;background:#fff;color:var(--ink)}
+.kw-err{color:var(--red);font-size:14px;font-weight:700;min-height:1.3em;margin-top:8px}
+.kw.shake{animation:shake .4s}
+.hook{margin:10px 0 0;font-size:15px;line-height:1.45;color:var(--ink2)}
 .sheet .row{display:flex;gap:8px;margin-top:14px}
 .sheet .row button{flex:1;min-height:50px;border-radius:14px;font-weight:700}
 .sec-btn{border:1.5px solid var(--ink)}
@@ -131,3 +141,49 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
   padding:12px 18px;border-radius:999px;font-size:14px;font-weight:600;transition:transform .25s;z-index:60;max-width:90%;text-align:center}
 .toast.show{transform:translateX(-50%) translateY(0)}
 @media (max-width:360px){.home-head h1{font-size:38px}.mode{font-size:12px}}
+
+/* interludio, a tutto schermo anche su desktop */
+#scene.screen.active{position:fixed;inset:0;z-index:40;display:flex;flex-direction:column;max-width:none;width:auto;
+  background:#070B10;color:#E8EEF2;overflow:hidden;cursor:pointer;
+  font-family:Inter,"Noto Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+.scene-bg{position:absolute;inset:0;background-position:center 18%;background-size:cover;background-repeat:no-repeat}
+.scene-bg::after{content:"";position:absolute;left:0;right:0;bottom:0;height:46%;
+  background:linear-gradient(to top, rgba(6,10,14,.78), rgba(6,10,14,0))}
+.lamp{position:absolute;z-index:2;left:7%;top:11%;width:min(22vw,200px);height:min(22vw,200px);pointer-events:none;
+  background:radial-gradient(circle, rgba(232,131,58,.5), rgba(232,131,58,0) 68%);mix-blend-mode:screen;animation:flicker 2.8s infinite}
+@keyframes flicker{0%,18%,22%,100%{opacity:.25}20%{opacity:.9}24%{opacity:.18}58%{opacity:.55}61%{opacity:.12}78%{opacity:.72}}
+.scene-top{position:relative;z-index:5;display:flex;align-items:flex-start;gap:8px;
+  padding:calc(10px + var(--safe-top)) 12px 0}
+.scene-back{width:40px;height:40px;border-radius:10px;color:#E8EEF2;font-size:22px;background:rgba(8,14,18,.45);flex:none}
+.recon{border:1.5px solid #7FD8A6;color:#7FD8A6;font-family:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  font-size:clamp(10px,2.5vw,13px);letter-spacing:.08em;font-weight:700;padding:7px 10px;border-radius:4px;
+  background:rgba(8,14,18,.5);white-space:nowrap}
+.scene-top-right{margin-left:auto;display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+.clock{color:#7FD8A6;font-family:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  font-size:clamp(10px,2.4vw,13px);letter-spacing:.06em;font-weight:700;padding-top:6px;white-space:nowrap}
+.skip{border:1px solid rgba(232,238,242,.5);color:#E8EEF2;border-radius:999px;padding:6px 12px;font-size:13px;
+  min-height:36px;background:rgba(8,14,18,.45)}
+.cast{position:relative;z-index:3;flex:1;min-height:160px}
+.portrait{position:absolute;bottom:0;height:min(92%,820px);width:auto;max-width:min(50vw,520px);object-fit:contain;
+  object-position:bottom center;filter:brightness(.4) saturate(.72);pointer-events:none;user-select:none;-webkit-user-drag:none}
+.portrait.left{left:1vw}.portrait.right{right:1vw}
+.portrait.speak{filter:none;z-index:2;animation:bob 2.6s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+.dlg{position:relative;z-index:5;flex:none;width:min(880px,calc(100% - 24px));margin:0 auto calc(12px + var(--safe-bot));
+  background:#0E141C;border:2px solid #E8833A;border-radius:16px;min-height:118px;padding:26px 46px 16px 16px;
+  box-shadow:0 12px 28px rgba(0,0,0,.4)}
+.nametag{position:absolute;top:-13px;font-weight:800;letter-spacing:.08em;font-size:13px;padding:4px 12px;border-radius:5px;color:#1A140E}
+.nametag.left{left:16px}.nametag.right{right:16px}
+.dlg .line{margin:0;font-size:17px;line-height:1.45;min-height:3.1em;color:#E8EEF2}
+.dlg .line.typing::after{content:"▍";color:#E8833A;animation:caret 1s steps(1) infinite}
+@keyframes caret{50%{opacity:0}}
+.advance{position:absolute;right:8px;bottom:6px;width:36px;height:36px;color:#E8833A;font-size:18px}
+@media (max-width:700px){
+  .dlg{min-height:108px;padding:22px 40px 14px 14px}
+  .dlg .line{font-size:16px}
+  .portrait{max-width:54vw;height:min(96%,640px)}
+}
+@media (prefers-reduced-motion: reduce){
+  .portrait.speak,.lamp,.dlg .line.typing::after{animation:none}
+  .lamp{opacity:.4}
+}

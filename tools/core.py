@@ -25,7 +25,7 @@ ART = {  # ind, def, a, di, su, nessun
  'f':  ('una ', 'la ', 'alla ', 'della ', 'sulla ', 'nessuna '),
  'fa': ("un'", "l'", "all'", "dell'", "sull'", "nessun'"),
 }
-SEAT = {'sedia', 'poltrona', 'trono', 'sdraio', 'divano'}
+SEAT = {'sedia', 'poltrona', 'trono', 'sdraio', 'divano', 'panca'}
 
 class Case:
     def __init__(self, d):
@@ -50,9 +50,16 @@ class Case:
         for x, t in self.obj.items(): self.typem[t] = self.typem.get(t, 0) | (1 << x)
         self.block = sum(1 << x for x, t in self.obj.items() if OBJ[t][3])
         self.free = self.full & ~self.block
-        self.people = [p[2] for p in d['people']] + [d['victim'][2]]
-        self.pinfo = {p[2]: p for p in d['people'] + [d['victim']]}
-        self.victim = d['victim'][2]
+        self.mode = d.get('mode', 'omicidio')
+        if self.mode == 'ana':
+            # accesso non autorizzato: niente vittima, la risposta è chi occupa una casella
+            self.people = [p[2] for p in d['people']]
+            self.pinfo = {p[2]: p for p in d['people']}
+            self.victim = None
+        else:
+            self.people = [p[2] for p in d['people']] + [d['victim'][2]]
+            self.pinfo = {p[2]: p for p in d['people'] + [d['victim']]}
+            self.victim = d['victim'][2]
         self.np = len(self.people)
         assert self.np == n, (d['id'], self.np, n)
     def rc(self, x): return divmod(x, self.n)
@@ -107,7 +114,7 @@ def compile_clues(case, clues):
 def count_solutions(case, clues, cap=2, collect=False, node_limit=None):
     dom0, btab, globs = compile_clues(case, clues)
     P = case.people; idx = {p: i for i, p in enumerate(P)}
-    n = case.n; V = idx[case.victim]
+    n = case.n;     V = idx[case.victim] if case.victim is not None else None
     by = [[] for _ in P]
     for (p, q, pq, qp) in btab:
         by[idx[p]].append((idx[q], pq)); by[idx[q]].append((idx[p], qp))
@@ -127,15 +134,16 @@ def count_solutions(case, clues, cap=2, collect=False, node_limit=None):
         if node_limit and nodes[0] > node_limit: raise TimeoutError()
         if len(sols) >= cap: return
         if nplaced == len(P):
-            # vincolo vittima: esattamente 2 persone nella stanza della vittima
-            vr = room_of[pos[V]]
-            if sum(1 for x in pos if room_of[x] == vr) != 2: return
+            # vincolo vittima: esattamente 2 persone nella stanza della vittima (solo omicidi)
+            if V is not None:
+                vr = room_of[pos[V]]
+                if sum(1 for x in pos if room_of[x] == vr) != 2: return
             if noempty:
                 occ = {room_of[x] for x in pos}
                 if len(occ) != len(roommasks): return
             sols.append(tuple(pos)); return
         excl = 0
-        if pos[V] >= 0:
+        if V is not None and pos[V] >= 0:
             vr = room_of[pos[V]]
             cnt = sum(1 for x in pos if x >= 0 and room_of[x] == vr)
             if cnt > 2: return
@@ -205,18 +213,19 @@ def human_solve(case, clues, want_log=True):
                         sup |= tab[y] & ~(case.rowm[rr] | case.colm[cc])
                     changed |= setd(a, dom[a] & sup, f"è l'unica casella coerente con l'indizio che lo lega a {case.pname(b)}" if g(a)=='m' else f"è l'unica casella coerente con l'indizio che la lega a {case.pname(b)}", 'binary')
             if changed: continue
-            vrooms = {case.room_of[x] for x in bits(dom[V])}
-            if len(vrooms) == 1:
-                vr = next(iter(vrooms)); rm = case.roomm[vr]
-                inside = [q for q in P if q != V and popc(dom[q]) == 1 and dom[q] & rm]
-                can = [q for q in P if q != V and dom[q] & rm]
-                if len(inside) > 1 or not can: raise Contradiction()
-                if inside:
-                    for q in P:
-                        if q != V and q not in inside and dom[q] & rm:
-                            changed |= setd(q, dom[q] & ~rm, f"la vittima era sola con l'assassino, quindi nessun altro poteva essere {case.room_in(vr)}", 'victim')
-                elif len(can) == 1:
-                    changed |= setd(can[0], dom[can[0]] & rm, f"è l'unica persona che poteva trovarsi {case.room_in(vr)} con la vittima", 'victim')
+            if V is not None:
+                vrooms = {case.room_of[x] for x in bits(dom[V])}
+                if len(vrooms) == 1:
+                    vr = next(iter(vrooms)); rm = case.roomm[vr]
+                    inside = [q for q in P if q != V and popc(dom[q]) == 1 and dom[q] & rm]
+                    can = [q for q in P if q != V and dom[q] & rm]
+                    if len(inside) > 1 or not can: raise Contradiction()
+                    if inside:
+                        for q in P:
+                            if q != V and q not in inside and dom[q] & rm:
+                                changed |= setd(q, dom[q] & ~rm, f"la vittima era sola con l'assassino, quindi nessun altro poteva essere {case.room_in(vr)}", 'victim')
+                    elif len(can) == 1:
+                        changed |= setd(can[0], dom[can[0]] & rm, f"è l'unica persona che poteva trovarsi {case.room_in(vr)} con la vittima", 'victim')
             if changed: continue
             for lines, label in ((case.rowm, 'riga'), (case.colm, 'colonna')):
                 for li, lm in enumerate(lines):
@@ -235,8 +244,9 @@ def human_solve(case, clues, want_log=True):
         return dom
     def final_check(dom):
         pos = {p: next(bits(m)) for p, m in dom.items()}
-        vr = case.room_of[pos[V]]
-        if sum(1 for x in pos.values() if case.room_of[x] == vr) != 2: raise Contradiction()
+        if V is not None:
+            vr = case.room_of[pos[V]]
+            if sum(1 for x in pos.values() if case.room_of[x] == vr) != 2: raise Contradiction()
         if 'noempty' in globs and len({case.room_of[x] for x in pos.values()}) != len(case.roomm): raise Contradiction()
     def solve(dom, log, ann):
         stats['branch_nodes'] += 1
